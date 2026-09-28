@@ -1,0 +1,5 @@
+MCP Test - Echo
+SPIKE - Ping Test
+SPIKE - RPA Challenge Test
+SPIKE - Ping
+SPIKE - RPA Challenge

@@ -31,6 +31,7 @@
 9. Navigateur du robot : **profil Chrome dédié** (`--user-data-dir`) pour ne jamais toucher au Chrome de l'utilisateur. Un profil neuf doit d'abord télécharger l'extension Blue Prism, installée par stratégie : le premier lancement est lent. Ça se prépare avant la démo.
 10. Tout process de test **ferme toujours son navigateur**, via Recover, puis Terminate, puis on relance l'exception. Sans ça, chaque run raté laisse des onglets ouverts.
 11. Listener du runtime (TCP 8181) : l'authentification par nom d'utilisateur s'écrit `user name <nom>`, puis `password <mdp>`. Un simple `user <x>` attend un GUID. C'est le bug du MCP de wasiakgrzes. Ensuite, `outputs <sessionId>` renvoie les sorties en XML.
+12. **Sérialiser chaque `WaitEnd` avant son `WaitStart`.** Dans le chargeur 7.5.1, la distance du bouton de condition est bornée pendant la lecture du WaitStart. Si le WaitEnd n'est pas encore chargé, elle retombe à zéro et la condition se cache derrière le Wait. Vérifié avec le même XML : distance native 0 avant réordonnancement, 75 après. Cet ordre de déclaration ne change aucun lien d'exécution.
 
 ## Protocole de test (à la demande de l'utilisateur : « du calme »)
 

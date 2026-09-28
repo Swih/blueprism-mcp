@@ -1,0 +1,94 @@
+[
+  {
+    "ID": "Windows",
+    "parameters": [],
+    "subTypes": [
+      {
+        "ID": "Browser",
+        "parameters": [],
+        "subTypes": [
+          {
+            "ID": "BrowserLaunch",
+            "parameters": [
+              {
+                "Name": "Path",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "File",
+                "Value": "",
+                "Enabled": true
+              },
+              {
+                "Name": "CommandLineParams",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "String",
+                "Value": null,
+                "Enabled": true
+              },
+              {
+                "Name": "prelaunchbrowser",
+                "DataTypeEquivalent": "flag",
+                "ParameterType": "Boolean",
+                "Value": "False",
+                "Enabled": true
+              },
+              {
+                "Name": "ProcessMode",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "List",
+                "Value": "Internal",
+                "Enabled": true
+              },
+              {
+                "Name": "ExternalProcessTimeout",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "Timespan",
+                "Value": "0",
+                "Enabled": false
+              }
+            ]
+          },
+          {
+            "ID": "BrowserAttach",
+            "parameters": [
+              {
+                "Name": "WindowTitle",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "String",
+                "Value": null,
+                "Enabled": true
+              },
+              {
+                "Name": "Path",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "File",
+                "Value": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+                "Enabled": true
+              },
+              {
+                "Name": "CommandLineParams",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "String",
+                "Value": null,
+                "Enabled": true
+              },
+              {
+                "Name": "ProcessMode",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "List",
+                "Value": "Internal",
+                "Enabled": true
+              },
+              {
+                "Name": "ExternalProcessTimeout",
+                "DataTypeEquivalent": "text",
+                "ParameterType": "Timespan",
+                "Value": "0",
+                "Enabled": false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

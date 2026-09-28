@@ -21,10 +21,9 @@ internal static class Catalog
         var clsAMI = ami.GetType("BluePrism.AMI.clsAMI", true);
         var appTypeInfo = ami.GetType("BluePrism.ApplicationManager.AMI.ApplicationTypeInfo", true);
 
-        var doc = new XmlDocument();
-        doc.LoadXml("<apptypeinfo><id>BrowserLaunch</id><parameters /></apptypeinfo>");
         var fromXml = appTypeInfo.GetMethods().First(m => m.Name == "FromXML" && m.IsStatic);
-        var browserApp = fromXml.Invoke(null, new object[] { doc.DocumentElement });
+        var browserApp = BrowserApplication(fromXml, "BrowserLaunch");
+        var browserAttach = BrowserApplication(fromXml, "BrowserAttach");
 
         var raw = Static(clsAMI, "GetElementTypes");
         var elementTypes = (raw is IDictionary dict ? dict.Values : (IEnumerable)raw).Cast<object>().ToList();
@@ -38,20 +37,13 @@ internal static class Catalog
         var browser = new List<object>();
         foreach (var et in elementTypes.Where(t => new[] { "Web", "Application" }.Contains((string)Prop(t, "AppType"))))
         {
-            browser.Add(new Dictionary<string, object>
-            {
-                ["id"] = Prop(et, "ID"),
-                ["appType"] = Prop(et, "AppType"),
-                ["name"] = Prop(et, "Name"),
-                ["defaultDataType"] = Prop(et, "DefaultDataType"),
-                ["help"] = Prop(et, "HelpText"),
-                ["actions"] = Items(Static(clsAMI, "GetAllowedActions", et, browserApp)).Select(ActionInfo).ToList(),
-                ["readActions"] = Items(Static(clsAMI, "GetAllowedReadActions", et, browserApp)).Select(ActionInfo).ToList(),
-                ["writeActions"] = Items(Static(clsAMI, "GetAllowedWriteAction", et)).Select(ActionInfo).ToList(),
-                ["conditions"] = Items(Static(clsAMI, "GetAllowedConditions", et, browserApp)).Select(ConditionInfo).ToList(),
-            });
+            browser.Add(ElementInfo(clsAMI, et, browserApp));
         }
         result["browserElementTypes"] = browser;
+        // Root operations depend on application mode: BrowserAttach uses IsConnected,
+        // whereas BrowserLaunch uses WebIsConnected. Never derive one from the other.
+        var application = elementTypes.Single(t => (string)Prop(t, "ID") == "Application");
+        result["browserAttachApplication"] = ElementInfo(clsAMI, application, browserAttach);
 
         // Identifiers (element attributes) the Web app type defines, in Blue Prism's order.
         var grouped = Static(clsAMI, "get_ApplicationGroupedIdentifiers");
@@ -69,6 +61,27 @@ internal static class Catalog
             }).ToList();
         return new JavaScriptSerializer { MaxJsonLength = int.MaxValue }.Serialize(result);
     }
+
+    private static object BrowserApplication(MethodInfo fromXml, string kind)
+    {
+        var doc = new XmlDocument();
+        doc.LoadXml("<apptypeinfo><id>" + kind + "</id><parameters /></apptypeinfo>");
+        return fromXml.Invoke(null, new object[] { doc.DocumentElement });
+    }
+
+    private static Dictionary<string, object> ElementInfo(Type ami, object element, object application) =>
+        new Dictionary<string, object>
+        {
+            ["id"] = Prop(element, "ID"),
+            ["appType"] = Prop(element, "AppType"),
+            ["name"] = Prop(element, "Name"),
+            ["defaultDataType"] = Prop(element, "DefaultDataType"),
+            ["help"] = Prop(element, "HelpText"),
+            ["actions"] = Items(Static(ami, "GetAllowedActions", element, application)).Select(ActionInfo).ToList(),
+            ["readActions"] = Items(Static(ami, "GetAllowedReadActions", element, application)).Select(ActionInfo).ToList(),
+            ["writeActions"] = Items(Static(ami, "GetAllowedWriteAction", element)).Select(ActionInfo).ToList(),
+            ["conditions"] = Items(Static(ami, "GetAllowedConditions", element, application)).Select(ConditionInfo).ToList(),
+        };
 
     private static Dictionary<string, object> ActionInfo(object a) => new Dictionary<string, object>
     {

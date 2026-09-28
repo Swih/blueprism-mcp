@@ -1,0 +1,2 @@
+Supplied value 'not-a-guid' is not a valid session identifier.
+The correct format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx

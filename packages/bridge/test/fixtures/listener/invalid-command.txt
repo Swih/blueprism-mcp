@@ -1,0 +1,1 @@
+INVALID COMMAND - use 'help'

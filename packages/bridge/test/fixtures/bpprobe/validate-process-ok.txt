@@ -1,0 +1,11 @@
+OK: name=MCP Test - Echo type=Process stages=14
+  Calculation: 2
+  Data: 5
+  Decision: 1
+  End: 1
+  Exception: 1
+  ProcessInfo: 1
+  Start: 1
+  WaitEnd: 1
+  WaitStart: 1
+  [WaitStartStage] Wait: 0 step(s)

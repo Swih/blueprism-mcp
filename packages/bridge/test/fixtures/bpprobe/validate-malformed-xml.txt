@@ -1,0 +1,12 @@
+INVALID: System.Xml.XmlException: Fin de fichier inattendue. Les éléments suivants ne sont pas fermés : process. Ligne 1, position 1.
+   à System.Xml.XmlTextReaderImpl.Throw(Exception e)
+   à System.Xml.XmlTextReaderImpl.ThrowUnclosedElements()
+   à System.Xml.XmlTextReaderImpl.ParseAttributes()
+   à System.Xml.XmlTextReaderImpl.ParseElement()
+   à System.Xml.XmlTextReaderImpl.ParseElementContent()
+   à System.Xml.XmlLoader.LoadNode(Boolean skipOverWhitespace)
+   à System.Xml.XmlLoader.LoadDocSequence(XmlDocument parentDoc)
+   à System.Xml.XmlDocument.Load(XmlReader reader)
+   à System.Xml.XmlDocument.LoadXml(String xml)
+   à BluePrism.AutomateProcessCore.ProcessXmlDocument..ctor(String xml)
+   à BluePrism.AutomateProcessCore.BluePrismProcess.FromXmlThrowsErrors(IGroupObjectDetails externalObjects, String xml, Boolean editable, Boolean fullProcess)

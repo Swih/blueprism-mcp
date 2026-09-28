@@ -1,0 +1,87 @@
+{
+  "name": "BPDEV RPA Challenge - Basic Actions",
+  "description": "Owns the test browser lifecycle. Screen objects attach to this session; business actions live in Form.",
+  "runMode": "Exclusive",
+  "application": {
+    "kind": "BrowserLaunch",
+    "name": "RPA Challenge",
+    "browserPath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "url": "https://rpachallenge.com/",
+    "extraArgs": [
+      "--user-data-dir=\"{robotProfileDir}\"",
+      "--no-first-run",
+      "--no-default-browser-check"
+    ]
+  },
+  "elements": [
+    {
+      "key": "start",
+      "name": "Home - Start",
+      "type": "WebButton",
+      "match": {
+        "wElementType": "BUTTON",
+        "wXPath": "//button[normalize-space(.) = 'Start']"
+      },
+      "rationale": "Observed visible label. Recheck unique matching when the page language changes."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Launch",
+      "description": "Launch the robot profile and wait for the START button.",
+      "published": true,
+      "inputs": [
+        {
+          "name": "Wait Timeout",
+          "type": "number",
+          "description": "Maximum seconds to wait for the target state",
+          "defaultValue": 30
+        }
+      ],
+      "outputs": [],
+      "steps": [
+        {
+          "kind": "launch"
+        },
+        {
+          "kind": "waitFor",
+          "name": "Wait Ready",
+          "element": "start",
+          "timeoutSeconds": "[Wait Timeout]",
+          "onTimeout": {
+            "type": "System Exception",
+            "detail": "RPA Challenge home did not become ready."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attach",
+      "description": "Attach only if not already connected to the challenge browser.",
+      "published": true,
+      "inputs": [],
+      "outputs": [],
+      "steps": [
+        {
+          "kind": "ensureAttached",
+          "args": {
+            "WindowTitle": "\"Rpa Challenge*\"",
+            "ProcessName": "\"chrome\""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Terminate",
+      "description": "Close the browser owned by this object.",
+      "published": true,
+      "inputs": [],
+      "outputs": [],
+      "steps": [
+        {
+          "kind": "close"
+        }
+      ]
+    }
+  ]
+}

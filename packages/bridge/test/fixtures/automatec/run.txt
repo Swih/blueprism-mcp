@@ -1,0 +1,4 @@
+Started process:MCP Test - Echo
+Resource: BPDEV-ROBOT
+Actual resource: BPDEV-ROBOT
+Session: a8fa9890-baad-4ea8-8fbb-1ccc2749c7db

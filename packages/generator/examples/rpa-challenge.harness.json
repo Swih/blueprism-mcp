@@ -1,0 +1,14 @@
+{
+  "object": "RPA Challenge - Form",
+  "calls": [
+    { "action": "Launch" },
+    { "action": "Get Start Text", "expect": { "Start Text": "START" } },
+    {
+      "action": "Set Field First Name",
+      "inputs": { "First Name": "\"Claude\"" },
+      "expect": { "First Name Read Back": "Claude" }
+    },
+    { "action": "Terminate" }
+  ],
+  "cleanupAction": "Terminate"
+}

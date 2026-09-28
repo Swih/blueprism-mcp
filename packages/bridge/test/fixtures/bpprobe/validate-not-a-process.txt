@@ -1,0 +1,3 @@
+INVALID: BluePrism.Server.Domain.Models.InvalidFormatException: Ce n'est pas une définition de processus valide (l'élément racine est <foo> - cela devrait être <process>)
+   à BluePrism.AutomateProcessCore.ProcessXmlDocument..ctor(String xml)
+   à BluePrism.AutomateProcessCore.BluePrismProcess.FromXmlThrowsErrors(IGroupObjectDetails externalObjects, String xml, Boolean editable, Boolean fullProcess)

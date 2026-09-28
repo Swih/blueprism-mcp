@@ -1,0 +1,4 @@
+RESOURCE UNIT
+ - FAILED 2d1a74d6-b4f6-4ef7-a6e3-1b8da0119b9f - System Exception : RPA Challenge home page did not load
+ - COMPLETED c3abb528-1570-42be-ba95-ad54a5c9bbdc
+Total running: 2

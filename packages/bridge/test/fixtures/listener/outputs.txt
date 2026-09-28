@@ -1,0 +1,1 @@
+OUTPUTS:<outputs><output name="Echo" type="text" value="Claude" /><output name="Start Text" type="text" value="START" /></outputs>

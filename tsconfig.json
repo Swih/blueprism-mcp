@@ -1,4 +1,17 @@
 {
   "files": [],
-  "references": [{ "path": "packages/model" }]
+  "references": [
+    {
+      "path": "packages/model"
+    },
+    {
+      "path": "packages/catalog"
+    },
+    {
+      "path": "packages/generator"
+    },
+    {
+      "path": "packages/bridge"
+    }
+  ]
 }

@@ -47,7 +47,15 @@ internal static class Validate
             foreach (var step in steps)
             {
                 var action = Get(step, "Action") ?? Get(step, "Condition");
-                Console.WriteLine($"      element={Get(step, "ElementId")} action={(action == null ? "null" : Get(action, "ID"))} expr={Get(step, "Expression")}");
+                var expr = Get(step, "Expression");
+                Console.WriteLine($"      element={Get(step, "ElementId")} action={(action == null ? "null" : Get(action, "ID"))} expr={(expr == null ? "" : Get(expr, "NormalForm") ?? expr)}");
+                if (Get(s, "Choices") is IEnumerable)
+                    Console.WriteLine($"        choice distance={Get(step, "Distance")} location={Get(step, "Location")}");
+                foreach (var parameter in (Get(step, "Parameters") as IEnumerable ?? Enumerable.Empty<object>()))
+                {
+                    var value = Get(parameter, "Expression");
+                    Console.WriteLine($"        dynamic {Get(parameter, "Name")}={(value == null ? "" : Get(value, "NormalForm") ?? value)} type={Get(parameter, "DataType")} comparison={Get(parameter, "ComparisonType")}");
+                }
             }
         }
         return 0;

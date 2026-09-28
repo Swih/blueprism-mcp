@@ -1,0 +1,111 @@
+{
+  "name": "RPA Challenge - Form",
+  "description": "RPA Challenge (https://rpachallenge.com/) input form: launches Chrome with a dedicated robot profile, fills the form fields and reads them back.",
+  "runMode": "Exclusive",
+  "application": {
+    "kind": "BrowserLaunch",
+    "name": "RPA Challenge",
+    "browserPath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "url": "https://rpachallenge.com/",
+    "extraArgs": [
+      "--user-data-dir={robotProfileDir}",
+      "--no-first-run",
+      "--no-default-browser-check"
+    ]
+  },
+  "elements": [
+    {
+      "key": "startButton",
+      "name": "Home - Start Button",
+      "type": "WebButton",
+      "match": { "wElementType": "BUTTON", "wCssSelector": "button.btn-large" },
+      "captured": { "wPageAddress": "https://rpachallenge.com/", "wInnerText": "START" },
+      "rationale": "The only large button of the page; its id and name change on every load."
+    },
+    {
+      "key": "firstNameField",
+      "name": "Form - First Name Field",
+      "type": "WebTextEdit",
+      "match": {
+        "wElementType": "INPUT",
+        "wCssSelector": "input[ng-reflect-name='labelFirstName']"
+      },
+      "captured": { "wPageAddress": "https://rpachallenge.com/" },
+      "rationale": "Fields move and get random ids and names on every round; the Angular binding name (ng-reflect-name) is the stable business attribute."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Launch",
+      "description": "Launches Chrome on RPA Challenge with the robot profile and waits for the home page (START button).",
+      "inputs": [],
+      "outputs": [],
+      "steps": [
+        { "kind": "launch" },
+        {
+          "kind": "waitFor",
+          "element": "startButton",
+          "timeoutSeconds": 30,
+          "onTimeout": {
+            "type": "System Exception",
+            "detail": "RPA Challenge home page did not load (START button not found)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Set Field First Name",
+      "description": "Writes the First Name field, then reads it back so the caller can check the value.",
+      "inputs": [{ "name": "First Name", "type": "text", "description": "Value to write" }],
+      "outputs": [
+        {
+          "name": "First Name Read Back",
+          "type": "text",
+          "description": "Value of the field after writing"
+        }
+      ],
+      "steps": [
+        {
+          "kind": "waitFor",
+          "element": "firstNameField",
+          "timeoutSeconds": 5,
+          "onTimeout": {
+            "type": "System Exception",
+            "detail": "First Name field not found by its CSS selector"
+          }
+        },
+        { "kind": "write", "element": "firstNameField", "value": "[First Name]" },
+        {
+          "kind": "read",
+          "element": "firstNameField",
+          "action": "WebGetValue",
+          "into": "First Name Read Back"
+        }
+      ]
+    },
+    {
+      "name": "Get Start Text",
+      "description": "Reads the label of the START button.",
+      "inputs": [],
+      "outputs": [
+        { "name": "Start Text", "type": "text", "description": "Text of the START button" }
+      ],
+      "steps": [
+        {
+          "kind": "waitFor",
+          "element": "startButton",
+          "timeoutSeconds": 5,
+          "onTimeout": { "type": "System Exception", "detail": "START button not found" }
+        },
+        { "kind": "read", "element": "startButton", "action": "WebGetText", "into": "Start Text" }
+      ]
+    },
+    {
+      "name": "Terminate",
+      "description": "Closes the robot's browser.",
+      "inputs": [],
+      "outputs": [],
+      "steps": [{ "kind": "close" }]
+    }
+  ]
+}

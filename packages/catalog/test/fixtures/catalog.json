@@ -1,0 +1,958 @@
+{
+  "source": "hand-written test subset of AMI.dll 10.0.136.0 (Blue Prism 7.5.1)",
+  "browserAttachApplication": {
+    "id": "Application",
+    "appType": "Application",
+    "defaultDataType": "",
+    "actions": [
+      {
+        "id": "AttachApplication",
+        "returns": "",
+        "arguments": [
+          { "id": "WindowTitlesCollection", "dataType": "collection" },
+          { "id": "WindowTitle", "dataType": "text" },
+          { "id": "ProcessName", "dataType": "text" },
+          { "id": "ProcessID", "dataType": "number" },
+          { "id": "Username", "dataType": "text" },
+          { "id": "ChildIndex", "dataType": "number" }
+        ],
+        "outputs": [{ "id": "trackingid", "dataType": "text" }]
+      }
+    ],
+    "readActions": [
+      { "id": "IsConnected", "returns": "flag", "arguments": [], "outputs": [] }
+    ],
+    "writeActions": [],
+    "conditions": []
+  },
+  "browserElementTypes": [
+    {
+      "id": "Application",
+      "appType": "Application",
+      "defaultDataType": "",
+      "actions": [
+        {
+          "id": "Launch",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "Path",
+              "dataType": "text"
+            },
+            {
+              "id": "CommandLineParams",
+              "dataType": "text"
+            },
+            {
+              "id": "prelaunchbrowser",
+              "dataType": "flag"
+            },
+            {
+              "id": "ProcessMode",
+              "dataType": "text"
+            }
+          ],
+          "outputs": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCloseApplication",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebNavigateApplication",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "newurl",
+              "dataType": "text"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "readActions": [
+        {
+          "id": "WebGetDocumentURL",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "writeActions": [],
+      "conditions": [
+        {
+          "id": "WebGetDocumentURL",
+          "dataType": "text",
+          "default": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "WebElement",
+      "appType": "Web",
+      "defaultDataType": "text",
+      "actions": [
+        {
+          "id": "WebClick",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebFocus",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebSendKeys",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "newtext",
+              "dataType": "text"
+            },
+            {
+              "id": "interval",
+              "dataType": "number"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "readActions": [
+        {
+          "id": "WebGetText",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetValue",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetAttribute",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "propname",
+              "dataType": "text"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetBounds",
+          "returns": "collection",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "writeActions": [
+        {
+          "id": "WebWrite",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "conditions": [
+        {
+          "id": "WebCheckExists",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckParentDocumentLoaded",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckValue",
+          "dataType": "text",
+          "default": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "WebButton",
+      "appType": "Web",
+      "defaultDataType": "text",
+      "actions": [
+        {
+          "id": "WebClick",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebFocus",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebSendKeys",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "newtext",
+              "dataType": "text"
+            },
+            {
+              "id": "interval",
+              "dataType": "number"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "readActions": [
+        {
+          "id": "WebGetText",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetValue",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetAttribute",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "propname",
+              "dataType": "text"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetBounds",
+          "returns": "collection",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "writeActions": [
+        {
+          "id": "WebWrite",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "conditions": [
+        {
+          "id": "WebCheckExists",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckParentDocumentLoaded",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckValue",
+          "dataType": "text",
+          "default": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "WebTextEdit",
+      "appType": "Web",
+      "defaultDataType": "text",
+      "actions": [
+        {
+          "id": "WebClick",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebFocus",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebSendKeys",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "newtext",
+              "dataType": "text"
+            },
+            {
+              "id": "interval",
+              "dataType": "number"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "readActions": [
+        {
+          "id": "WebGetText",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetValue",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetAttribute",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "propname",
+              "dataType": "text"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetBounds",
+          "returns": "collection",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "writeActions": [
+        {
+          "id": "WebWrite",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "conditions": [
+        {
+          "id": "WebCheckExists",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckParentDocumentLoaded",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckValue",
+          "dataType": "text",
+          "default": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "WebListItem",
+      "appType": "Web",
+      "defaultDataType": "text",
+      "actions": [
+        {
+          "id": "WebClick",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebFocus",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebSendKeys",
+          "returns": "",
+          "arguments": [
+            {
+              "id": "newtext",
+              "dataType": "text"
+            },
+            {
+              "id": "interval",
+              "dataType": "number"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "readActions": [
+        {
+          "id": "WebGetText",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetValue",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetAttribute",
+          "returns": "text",
+          "arguments": [
+            {
+              "id": "propname",
+              "dataType": "text"
+            },
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        },
+        {
+          "id": "WebGetBounds",
+          "returns": "collection",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ],
+          "outputs": []
+        }
+      ],
+      "writeActions": [],
+      "conditions": [
+        {
+          "id": "WebCheckExists",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckParentDocumentLoaded",
+          "dataType": "flag",
+          "default": "True",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        },
+        {
+          "id": "WebCheckValue",
+          "dataType": "text",
+          "default": "",
+          "arguments": [
+            {
+              "id": "trackingid",
+              "dataType": "text"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "webIdentifiers": [
+    {
+      "id": "wX",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wY",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wWidth",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wHeight",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wName",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wId",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wXPath",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wCssSelector",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wElementType",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wValue",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wPageAddress",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wClass",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wClientX",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wClientY",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wClientWidth",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wClientHeight",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wOffsetX",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wOffsetY",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wOffsetWidth",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wOffsetHeight",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wScrollX",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wScrollY",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wScrollWidth",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wScrollHeight",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wChildCount",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wIsEditable",
+      "dataType": "flag",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wStyle",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wTabIndex",
+      "dataType": "number",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wInputType",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wAccessKey",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wInnerText",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wSource",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wTargetAddress",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wAlt",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wPattern",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wRel",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wLinkTarget",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    },
+    {
+      "id": "wPlaceholder",
+      "dataType": "text",
+      "enableByDefault": false,
+      "comparison": "Equal",
+      "userVisible": true
+    }
+  ]
+}

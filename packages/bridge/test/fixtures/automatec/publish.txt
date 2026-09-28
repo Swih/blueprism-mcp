@@ -1,0 +1,1 @@
+Added 'Published' attribute to process 'MCP Test - Echo'

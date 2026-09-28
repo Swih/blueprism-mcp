@@ -10,13 +10,17 @@ verified format rules are in [docs/01-spikes.md](docs/01-spikes.md).
 ```
 packages/
   model/     @bpdev/model   Lossless Blue Prism XML document (parse <-> serialize) + typed views
+  catalog/   @bpdev/catalog Local installed application/action catalogue + validation
+  generator/ @bpdev/generator Typed IR -> native objects and test processes
+  bridge/    @bpdev/bridge  Runtime integration (work in progress)
 tools/
   bpprobe/                  C# read-only probe of the Blue Prism install (catalog, validate...)
 docs/                       Scoping, spikes, architecture contract
 spikes/                     Throwaway proofs (history, not shipped)
 ```
 
-Planned next: `catalog`, `generator`, `bridge` (see the contract).
+The generator supports shared private pages, conditional Attach, dynamic element parameters,
+and state-based Waits. See [the IR](docs/05-ir.md) and [the RPA Challenge examples and validation limits](docs/06-dynamic-spy.md).
 
 ## Checks
 

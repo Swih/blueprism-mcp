@@ -1,0 +1,24 @@
+{
+  "name": "@bpdev/bridge",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bridge to a local Blue Prism: AutomateC, runtime listener, bpprobe, credentials.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@bpdev/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -p test/tsconfig.json"
+  },
+  "dependencies": {
+    "@bpdev/model": "0.0.0"
+  }
+}

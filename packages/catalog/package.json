@@ -1,0 +1,25 @@
+{
+  "name": "@bpdev/catalog",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Blue Prism Application Manager catalogue (element types, actions, conditions, identifiers).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@bpdev/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -p test/tsconfig.json",
+    "catalog:extract": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/extract.ps1"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  }
+}

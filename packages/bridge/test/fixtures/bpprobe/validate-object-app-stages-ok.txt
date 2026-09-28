@@ -1,0 +1,26 @@
+OK: name=SPIKE - RPA Challenge type=Object stages=32
+  Data: 3
+  End: 6
+  Exception: 2
+  Navigate: 2
+  ProcessInfo: 1
+  Read: 2
+  Start: 6
+  SubSheetInfo: 5
+  WaitEnd: 2
+  WaitStart: 2
+  Write: 1
+  [NavigateStage] Launch Browser: 1 step(s)
+      element=c99eeb23-8826-54d2-ba90-bc061b6023eb action=Launch expr=
+  [WaitStartStage] Wait for Home: 1 step(s)
+      element=ef0accf0-aec0-51d1-98e1-0b5158fc0c90 action=WebCheckExists expr=True
+  [ReadStage] Read Start Text: 1 step(s)
+      element=ef0accf0-aec0-51d1-98e1-0b5158fc0c90 action=WebGetText expr=
+  [WaitStartStage] Wait for First Name: 1 step(s)
+      element=ab938561-02a3-5f38-9d95-9a890fb8e649 action=WebCheckExists expr=True
+  [WriteStage] Write First Name: 1 step(s)
+      element=ab938561-02a3-5f38-9d95-9a890fb8e649 action=WebWrite expr=[First Name]
+  [ReadStage] Read First Name: 1 step(s)
+      element=ab938561-02a3-5f38-9d95-9a890fb8e649 action=WebGetValue expr=
+  [NavigateStage] Close Browser: 1 step(s)
+      element=c99eeb23-8826-54d2-ba90-bc061b6023eb action=WebCloseApplication expr=

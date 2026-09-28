@@ -7,13 +7,17 @@ Quatre releases réelles (Blue Prism 7.4) ont été fournies le 28/09/2026 comme
 
 Ce document n'en garde que des enseignements génériques.
 
-## 1. Pratique réelle du spy : ce qu'on fera mieux
+## 1. Pratique réelle du spy : ce qu'on reprend et ce qu'on vérifie
 
 Sur ~90 éléments web :
-- la combinaison dominante est **`wXPath` absolu + `matchindex`** (39 fois), puis `wElementType + wXPath` ;
+- une combinaison fréquente est **`wXPath` + `matchindex`** (39 fois dans le premier relevé), puis `wElementType + wXPath` ;
 - `wId` n'apparaît que 13 fois, et **`wCssSelector` jamais**.
 
-Ce spy casse dès qu'une page bouge. C'est le différenciateur de la démo : l'agent choisit des attributs **stables et uniques** (`wId`, `wName`, `wCssSelector` sur un attribut métier), vérifie leur unicité, et le linter signale le XPath absolu.
+Ce décompte ne suffit pas à juger la qualité du spy. La première lecture confondait présence de XPath et fragilité : les objets WttJ et LinkedIn contiennent aussi des XPath sémantiques et des attributs dynamiques réutilisés par les étapes. On reprend leur organisation et leur paramétrage, puis on vérifie chaque cible sur le DOM réel.
+
+Un XPath ancré sur un libellé stable peut résister aux déplacements. Un ID aléatoire ou un CSS fondé sur la position peut casser. Les indices restent possibles pour parcourir une liste, à condition de vérifier le contexte et l'identité de l'item. Le choix XPath/CSS ne remplace donc ni le contrôle d'unicité ni les essais après changement d'état.
+
+Pour RPA Challenge, les sept champs ont été vérifiés avec `//label[normalize-space(.) = 'First Name']/following-sibling::input` et ses variantes. Les identifiants et positions ont changé entre trois chargements puis entre les tours 1, 2 et 3 ; les sélecteurs sont restés uniques. Voir [le relevé et ses limites](06-dynamic-spy.md).
 
 Il y a aussi des éléments **UIA** (Window, UIAButton, UIAComboBox…) pour les fenêtres natives (dialogues, Excel). Il faudra un second mode, après le navigateur.
 

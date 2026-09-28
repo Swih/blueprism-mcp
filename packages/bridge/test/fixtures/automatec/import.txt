@@ -1,0 +1,2 @@
+Importing C:\bpdev\fixtures\MCP Test - Echo.bpprocess
+Imported process

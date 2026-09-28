@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<process name="SPIKE - Ping Test" version="1.0" bpversion="7.5.1.18099" narrative="Spike S2/S3 - generated" byrefcollection="true" preferredid="5044728d-7653-5c7e-8a9d-b507c53081e7">
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <stage stageid="d6ce18e1-deb0-56d8-8213-ace06d97d16b" name="Info" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="c4cb11e0-7a81-5b5c-932c-f1017f4ed1d0" name="Start" type="Start">
+    <display x="15" y="-90" />
+    <onsuccess>5c862f82-c3e8-5a92-91c4-cb905c6d6850</onsuccess>
+  </stage>
+  <stage stageid="5c862f82-c3e8-5a92-91c4-cb905c6d6850" name="Ping" type="Action">
+    <display x="15" y="-30" />
+    <inputs>
+      <input type="text" name="Text" friendlyname="Text" expr="&quot;pong&quot;" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Text" friendlyname="Text" stage="Echo" />
+    </outputs>
+    <resource object="SPIKE - Ping" action="Ping" />
+    <onsuccess>fb4710c8-59a8-5c6d-95d4-748f53565807</onsuccess>
+  </stage>
+  <stage stageid="fb4710c8-59a8-5c6d-95d4-748f53565807" name="End" type="End">
+    <display x="15" y="30" />
+    <outputs>
+      <output type="text" name="Echo" stage="Echo" />
+    </outputs>
+  </stage>
+  <stage stageid="79d2c81f-9895-5bae-a301-b67326c79aba" name="Echo" type="Data">
+    <display x="195" y="-90" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+</process>

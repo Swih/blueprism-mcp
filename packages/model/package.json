@@ -1,0 +1,27 @@
+{
+  "name": "@bpdev/model",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Lossless Blue Prism XML document model (parse <-> serialize) and thin typed views.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@bpdev/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -p test/tsconfig.json"
+  },
+  "dependencies": {
+    "sax": "^1.6.1"
+  },
+  "devDependencies": {
+    "@types/sax": "^1.2.7"
+  }
+}

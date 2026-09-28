@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='utf-8'?>
+<process name="SPIKE - Ping" version="1.0" bpversion="7.5.1.18099" narrative="Spike S2/S3 - generated" byrefcollection="true" preferredid="61441207-2f4d-5ba1-ac8d-625f530e5973" type="object" runmode="Background">
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <appdef>
+    <element name="Application Root">
+      <id>74c03310-3dc5-5913-ab15-0e4e66f2d6c0</id>
+    </element>
+  </appdef>
+  <stage stageid="358f6295-219a-5056-abf5-ad5ba9fdafc8" name="Info" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+    <references>
+      <reference>System.dll</reference>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Data</import>
+    </imports>
+    <language>visualbasic</language>
+    <pythondllpath />
+    <pythonenvpath />
+    <globalcode />
+    <code />
+  </stage>
+  <stage stageid="9f110ca5-686f-51b8-b6d3-e5795c2e57bd" name="Start" type="Start">
+    <display x="15" y="-90" />
+    <onsuccess>46346ca4-e297-51eb-b573-dd69b9ea33e5</onsuccess>
+  </stage>
+  <stage stageid="46346ca4-e297-51eb-b573-dd69b9ea33e5" name="End" type="End">
+    <display x="15" y="-30" />
+  </stage>
+  <subsheet subsheetid="5d5e8ee0-7ecf-57ef-8f75-24161c8dcf76" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="c2fbac9f-371c-57e0-ba77-d16c6c668405" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>5d5e8ee0-7ecf-57ef-8f75-24161c8dcf76</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="4d6c4bc9-e4ac-5787-95a3-d354edde6ec5" name="Start" type="Start">
+    <subsheetid>5d5e8ee0-7ecf-57ef-8f75-24161c8dcf76</subsheetid>
+    <display x="15" y="-90" />
+    <onsuccess>1469f371-e6ed-5299-b4b7-134eb34ee9b5</onsuccess>
+  </stage>
+  <stage stageid="1469f371-e6ed-5299-b4b7-134eb34ee9b5" name="End" type="End">
+    <subsheetid>5d5e8ee0-7ecf-57ef-8f75-24161c8dcf76</subsheetid>
+    <display x="15" y="-30" />
+  </stage>
+  <subsheet subsheetid="f6b98627-3a90-552b-8588-b62f2fe0aeca" type="Normal" published="True">
+    <name>Ping</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom version="2">1.25</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="5458e43f-229e-5a10-8548-b9f67eb4fcb6" name="Ping" type="SubSheetInfo">
+    <subsheetid>f6b98627-3a90-552b-8588-b62f2fe0aeca</subsheetid>
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="8fb8a952-61ad-53d9-a9e2-1b350b13906c" name="Start" type="Start">
+    <subsheetid>f6b98627-3a90-552b-8588-b62f2fe0aeca</subsheetid>
+    <display x="15" y="-90" />
+    <inputs>
+      <input type="text" name="Text" stage="Text" />
+    </inputs>
+    <onsuccess>530afbef-61b4-59cc-8daa-1b7fc93c6953</onsuccess>
+  </stage>
+  <stage stageid="530afbef-61b4-59cc-8daa-1b7fc93c6953" name="End" type="End">
+    <subsheetid>f6b98627-3a90-552b-8588-b62f2fe0aeca</subsheetid>
+    <display x="15" y="-30" />
+    <outputs>
+      <output type="text" name="Text" stage="Text" />
+    </outputs>
+  </stage>
+  <stage stageid="c302fdef-2bc5-529d-babb-02f42636b6ce" name="Text" type="Data">
+    <subsheetid>f6b98627-3a90-552b-8588-b62f2fe0aeca</subsheetid>
+    <display x="195" y="-90" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+</process>

@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+<process name="SPIKE - RPA Challenge Test" version="1.0" bpversion="7.5.1.18099" narrative="Spike S2/S3 - generated" byrefcollection="true" preferredid="d24c85b0-ba5c-5da9-a0bc-4f67e1ccfc73">
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom version="2">1.25</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <stage stageid="12d8efa6-07d8-58f7-9a36-9da5fa8b4788" name="Info" type="ProcessInfo">
+    <display x="-195" y="-105" w="150" h="90" />
+  </stage>
+  <stage stageid="b17310fe-52b4-52ce-bed7-76ea14aa042b" name="Start" type="Start">
+    <display x="15" y="-90" />
+    <onsuccess>3fe92c10-2587-50f4-9c94-a09bebfd5f83</onsuccess>
+  </stage>
+  <stage stageid="3fe92c10-2587-50f4-9c94-a09bebfd5f83" name="Launch" type="Action">
+    <display x="15" y="-30" />
+    <resource object="SPIKE - RPA Challenge" action="Launch" />
+    <onsuccess>6dd807ba-be11-5d67-bb9c-6b5cde60dfa9</onsuccess>
+  </stage>
+  <stage stageid="6dd807ba-be11-5d67-bb9c-6b5cde60dfa9" name="Diagnose" type="Action">
+    <display x="15" y="30" />
+    <outputs>
+      <output type="text" name="Start Text" friendlyname="Start Text" stage="Start Text" />
+    </outputs>
+    <resource object="SPIKE - RPA Challenge" action="Diagnose" />
+    <onsuccess>ee728a09-083f-5c1a-a4c3-54b3af489275</onsuccess>
+  </stage>
+  <stage stageid="ee728a09-083f-5c1a-a4c3-54b3af489275" name="Write First Name" type="Action">
+    <display x="15" y="90" />
+    <inputs>
+      <input type="text" name="First Name" friendlyname="First Name" expr="&quot;Claude&quot;" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Value Read Back" friendlyname="Value Read Back" stage="Echo" />
+    </outputs>
+    <resource object="SPIKE - RPA Challenge" action="Write First Name" />
+    <onsuccess>1fdca9a1-4da8-577e-893f-be46633519f7</onsuccess>
+  </stage>
+  <stage stageid="1fdca9a1-4da8-577e-893f-be46633519f7" name="Terminate" type="Action">
+    <display x="15" y="150" />
+    <resource object="SPIKE - RPA Challenge" action="Terminate" />
+    <onsuccess>9409e8dc-a596-53dd-ad60-74a6b912614f</onsuccess>
+  </stage>
+  <stage stageid="9409e8dc-a596-53dd-ad60-74a6b912614f" name="End" type="End">
+    <display x="15" y="210" />
+    <outputs>
+      <output type="text" name="Echo" stage="Echo" />
+      <output type="text" name="Start Text" stage="Start Text" />
+    </outputs>
+  </stage>
+  <stage stageid="cc7f8f32-daa8-5e99-b874-f2b34460f74c" name="Echo" type="Data">
+    <display x="195" y="-90" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="9183fd1d-67d3-535c-92ef-334b72527065" name="Start Text" type="Data">
+    <display x="195" y="-45" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="1f1c7048-bcc8-5ba2-b0ee-491157459f6a" name="On Error" type="Recover">
+    <display x="195" y="30" />
+    <onsuccess>b505779d-dab8-5ad7-827a-e5c1366c1c6d</onsuccess>
+  </stage>
+  <stage stageid="b505779d-dab8-5ad7-827a-e5c1366c1c6d" name="Close Browser After Error" type="Action">
+    <display x="195" y="90" />
+    <onsuccess>c743d7cc-70c5-5dec-811e-70531ca86651</onsuccess>
+    <resource object="SPIKE - RPA Challenge" action="Terminate" />
+  </stage>
+  <stage stageid="c743d7cc-70c5-5dec-811e-70531ca86651" name="Resume" type="Resume">
+    <display x="195" y="150" />
+    <onsuccess>7e30d296-3afe-552f-bd29-586a325b9a78</onsuccess>
+  </stage>
+  <stage stageid="7e30d296-3afe-552f-bd29-586a325b9a78" name="Rethrow" type="Exception">
+    <display x="195" y="210" />
+    <exception localized="yes" type="" detail="" usecurrent="yes" />
+  </stage>
+</process>

@@ -1,0 +1,29 @@
+# Dependencies and builds
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+
+# Local secrets and machine state
+.env
+.env.*
+!.env.example
+.bpdev/
+
+# Third-party clones and reference material (never committed)
+candidates/
+
+# Blue Prism-derived data (extracted from SS&C DLLs) and spike outputs
+spikes/*.json
+spikes/*.bpobject
+spikes/*.bpprocess
+spikes/*.xml
+**/bpprobe.exe
+**/*.pdb
+
+# Python spike tooling
+__pycache__/
+.venv/
+
+# bpprobe build output
+tools/bpprobe/bin/

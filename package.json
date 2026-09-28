@@ -1,0 +1,32 @@
+{
+  "name": "bpdev",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Build Blue Prism 7.5 business objects and processes from an LLM, through typed models.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint . && prettier --check .",
+    "test": "vitest run",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.0",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "uuid": "^14.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2",
+    "zod": "^4.6.5"
+  }
+}

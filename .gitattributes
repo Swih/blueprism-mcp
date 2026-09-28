@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# Blue Prism files and test fixtures: keep bytes exactly (BOM, CRLF), no conversion.
+*.bpprocess -text
+*.bpobject -text
+*.bprelease -text
+packages/*/test/fixtures/** -text

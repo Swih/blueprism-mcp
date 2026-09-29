@@ -173,7 +173,7 @@ function addStep(
       page.main(
         "Exception",
         `Raise ${step.exception.type}`,
-        exceptionBody(step.exception.type, step.exception.detail),
+        exceptionBody(step.exception.type, step.exception.detail, step.exception.saveScreenCapture),
       );
       page.endFlow();
       return;
@@ -249,7 +249,7 @@ function addWait(
   const exception = page.branch(
     "Exception",
     step.onTimeout.type,
-    exceptionBody(step.onTimeout.type, step.onTimeout.detail),
+    exceptionBody(step.onTimeout.type, step.onTimeout.detail, step.onTimeout.saveScreenCapture),
   );
   Page.link(timeout, exception);
   page.continueFrom(choice, "ontrue");

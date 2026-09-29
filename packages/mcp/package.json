@@ -1,0 +1,34 @@
+{
+  "name": "@bpdev/mcp",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Local MCP server for building and diagnosing Blue Prism automations.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@bpdev/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -p test/tsconfig.json",
+    "start": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@bpdev/runner": "0.0.0",
+    "@bpdev/scanner": "0.0.0",
+    "@bpdev/generator": "0.0.0",
+    "@bpdev/bridge": "0.0.0",
+    "@bpdev/catalog": "0.0.0",
+    "@modelcontextprotocol/server": "2.2.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.2.0"
+  }
+}

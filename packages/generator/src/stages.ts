@@ -191,8 +191,20 @@ export function textExpression(value: string): string {
 }
 
 /** Exception stage body raising `type` with a plain-text `detail`. */
-export function exceptionBody(type: string, detail: string): BpElement[] {
-  return [el("exception", { localized: "yes", type, detail: textExpression(detail) })];
+export function exceptionBody(
+  type: string,
+  detail: string,
+  saveScreenCapture = false,
+): BpElement[] {
+  // BP enables capture by attribute presence, even savescreencapture="no". False must omit it.
+  return [
+    el("exception", {
+      localized: "yes",
+      type,
+      detail: textExpression(detail),
+      savescreencapture: saveScreenCapture ? "yes" : undefined,
+    }),
+  ];
 }
 
 /** Exception stage body rethrowing the current exception (end of a Recover block). */

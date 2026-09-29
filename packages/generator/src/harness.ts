@@ -1,5 +1,5 @@
 import type { Catalog } from "@bpdev/catalog";
-import { generatedFile, processElement, type GeneratedFile } from "./document.js";
+import { generatedFile, processElement } from "./document.js";
 import { IdRegistry } from "./ids.js";
 import {
   parseObjectSpec,
@@ -12,13 +12,14 @@ import { Page } from "./page.js";
 import { resolveHarness } from "./resolve-harness.js";
 import { resolveObject } from "./resolve-object.js";
 import { actionBody, dataItemBody, endBody, rethrowBody } from "./stages.js";
+import type { GeneratedHarness } from "./verify-harness.js";
 
 const MAIN_PAGE = "Main Page";
 
 /**
  * Generates the test process (`.bpprocess`) of a primary object, optionally calling other
  * supplied objects: it calls each action in order and
- * exposes the expected outputs as process outputs (checked by @bpdev/bridge, not here). Any
+ * exposes expected outputs with an assertionManifest for verifyHarnessOutputs in the runner. Any
  * exception goes through Recover, the cleanup action (e.g. Terminate, so no browser is left
  * open), then rethrows while still in recovery mode. Every object spec is checked
  * against the catalogue too, so a harness is never generated for an object that cannot be.
@@ -27,7 +28,7 @@ export function generateTestHarness(
   spec: TestHarnessSpec,
   objectSpec: ObjectSpec | readonly ObjectSpec[],
   catalog: Catalog,
-): GeneratedFile {
+): GeneratedHarness {
   const harness = parseTestHarnessSpec(spec);
   const specs: readonly ObjectSpec[] = Array.isArray(objectSpec)
     ? objectSpec
@@ -73,5 +74,9 @@ export function generateTestHarness(
     `Test harness of ${plan.object}: calls ${steps}. On any exception: Recover, ` +
     `${cleanupName}, then preserve and rethrow the exception without resuming.`;
   const root = processElement({ name: plan.name, narrative, preferredId }, page.stages);
-  return generatedFile(plan.name, root, "bpprocess");
+  return {
+    ...generatedFile(plan.name, root, "bpprocess"),
+    assertions: plan.assertions,
+    assertionManifest: { version: 1, processName: plan.name, assertions: plan.assertions },
+  };
 }

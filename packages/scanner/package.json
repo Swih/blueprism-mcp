@@ -1,0 +1,25 @@
+{
+  "name": "@bpdev/scanner",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bounded local DOM observations and XPath prevalidation for LLM-assisted BP development.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@bpdev/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -p test/tsconfig.json",
+    "test": "vitest run --root ../.. packages/scanner/test"
+  },
+  "dependencies": {
+    "playwright": "1.63.0"
+  }
+}

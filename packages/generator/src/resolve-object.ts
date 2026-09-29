@@ -577,6 +577,13 @@ function resolveAction(
           report(`${stepPath}.action`, notAllowed(found.type, step.action, "read"));
           break;
         }
+        if (operation.returns === "collection") {
+          report(
+            `${stepPath}.action`,
+            `${step.action} returns collection: native Collection generation is not qualified`,
+          );
+          break;
+        }
         target(step.into, operation.returns || undefined, stepPath, step.action);
         steps.push({
           kind: "read",

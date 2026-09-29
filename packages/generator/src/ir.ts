@@ -5,6 +5,7 @@
  */
 import { z } from "zod";
 import { SpecValidationError, type SpecIssue } from "./errors.js";
+import { isTemporalLiteral } from "./scalar-values.js";
 
 const nonEmpty = z.string().min(1);
 const expressions = z.record(z.string(), z.string());
@@ -12,18 +13,44 @@ const literal = z.union([z.string(), z.number(), z.boolean()]);
 /** Runtime values for Application Modeller's Dynamic attributes, not action arguments. */
 const elementParameters = z.record(nonEmpty, nonEmpty).optional();
 
-export const paramSpecSchema = z.strictObject({
-  name: nonEmpty,
-  type: z.enum(["text", "number", "flag", "date", "datetime", "password"]),
-  description: z.string(),
-  defaultValue: literal.optional(),
-});
+export const paramSpecSchema = z
+  .strictObject({
+    name: nonEmpty,
+    type: z.enum(["text", "number", "flag", "date", "datetime", "password"]),
+    description: z.string(),
+    defaultValue: literal.optional(),
+  })
+  .superRefine((param, ctx) => {
+    if (param.defaultValue === undefined) return;
+    if (param.type === "password") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["defaultValue"],
+        message: "password defaults are forbidden; supply a credential reference at runtime",
+      });
+    } else if (
+      (param.type === "date" || param.type === "datetime") &&
+      (typeof param.defaultValue !== "string" ||
+        (param.defaultValue !== "" && !isTemporalLiteral(param.type, param.defaultValue)))
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["defaultValue"],
+        message:
+          param.type === "date"
+            ? "must be empty or a valid YYYY-MM-DD date literal"
+            : "must be empty or a valid YYYY-MM-DDTHH:mm:ss[.fffffff][Z|+/-HH:mm] datetime literal",
+      });
+    }
+  });
 
 export const exceptionSpecSchema = z.strictObject({
   /** `System Exception`, `Business Exception` or any other Blue Prism exception type. */
   type: nonEmpty,
   /** Plain text (the generator turns it into a Blue Prism string expression). */
   detail: z.string(),
+  /** Request BP's native exception capture before process cleanup. Omitted by default. */
+  saveScreenCapture: z.boolean().optional(),
 });
 
 export const stepSpecSchema = z.discriminatedUnion("kind", [
@@ -154,7 +181,7 @@ export const testHarnessSpecSchema = z.strictObject({
         object: nonEmpty.optional(),
         /** Blue Prism expressions by input name, e.g. `{ "First Name": "\"Claude\"" }`. */
         inputs: expressions.optional(),
-        /** Expected literal values by output name; these outputs become process outputs. */
+        /** Expected scalar literals by output name; also emitted in the assertion manifest. */
         expect: z.record(z.string(), z.string()).optional(),
       }),
     )

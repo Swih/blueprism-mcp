@@ -1,0 +1,28 @@
+{
+  "name": "@bpdev/runner",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reproducible Blue Prism artifact preparation, deployment and verified runs.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@bpdev/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -p test/tsconfig.json"
+  },
+  "dependencies": {
+    "@bpdev/model": "0.0.0",
+    "@bpdev/catalog": "0.0.0",
+    "@bpdev/generator": "0.0.0",
+    "@bpdev/bridge": "0.0.0",
+    "zod": "^4.6.5"
+  }
+}

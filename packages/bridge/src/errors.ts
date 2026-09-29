@@ -34,8 +34,20 @@ export class ToolTimeoutError extends BpBridgeError {
     readonly tool: BridgeTool,
     readonly command: string,
     readonly timeoutMs: number,
+    readonly output = "",
   ) {
     super(`${tool} ${command} did not finish within ${timeoutMs} ms`);
+  }
+}
+
+/** The tool exceeded its output budget; diagnostics are explicitly incomplete. */
+export class ToolOutputLimitError extends BpBridgeError {
+  constructor(
+    readonly tool: BridgeTool,
+    readonly command: string,
+    readonly output: string,
+  ) {
+    super(`${tool} ${command} exceeded its output limit; diagnostics are truncated`);
   }
 }
 

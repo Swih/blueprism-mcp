@@ -8,8 +8,10 @@ import {
   InvalidArgumentError,
   RunOutcomeUnknownError,
   UnexpectedOutputError,
+  ToolTimeoutError,
+  ToolOutputLimitError,
 } from "../errors.js";
-import { runTool, type ToolRun } from "../process.js";
+import { maskSecrets, runTool, type ToolRun } from "../process.js";
 import { buildStartupInputs, type StartupParam } from "./inputs.js";
 import {
   findRunSessionId,
@@ -40,11 +42,13 @@ export interface AutomateCOptions {
   readonly timeoutMs?: number;
   /** Encoding of AutomateC's output: the Windows ANSI code page. Default `windows-1252`. */
   readonly outputEncoding?: string;
+  readonly maxOutputBytes?: number;
 }
 
 export interface RunOptions {
   /** `/resource`: the runtime resource to run on (e.g. `BPDEV-ROBOT`). */
   readonly resource: string;
+  readonly port?: number;
   /** `/startp`: typed startup parameters. */
   readonly inputs?: readonly StartupParam[];
 }
@@ -61,6 +65,7 @@ export class AutomateC {
   private readonly path: string;
   private readonly timeoutMs: number;
   private readonly encoding: string;
+  private readonly sessionSecrets = new Map<string, readonly string[]>();
 
   constructor(private readonly options: AutomateCOptions) {
     this.path = options.path ?? DEFAULT_AUTOMATEC_PATH;
@@ -70,8 +75,40 @@ export class AutomateC {
 
   /** Names of the processes and business objects the user can see. */
   async listProcesses(): Promise<string[]> {
-    const run = await this.exec("/listprocesses", ["/listprocesses"]);
-    return parseListProcesses(this.succeeded("/listprocesses", run));
+    return this.exec("/listprocesses", ["/listprocesses"], (run, redact) =>
+      parseListProcesses(this.succeeded("/listprocesses", run)).map(redact),
+    );
+  }
+
+  /** Create a new isolated queue through the native documented CLI, without release overwrite. */
+  async createQueue(name: string, keyField = "CaseKey", maxAttempts = 1): Promise<string> {
+    checkName(name);
+    if (
+      !name.startsWith("BPDEV ") ||
+      !/^[A-Za-z][A-Za-z0-9 ]{0,79}$/.test(keyField) ||
+      !Number.isInteger(maxAttempts) ||
+      maxAttempts < 1 ||
+      maxAttempts > 10
+    )
+      throw new InvalidArgumentError(
+        "Queue creation requires a BPDEV name, simple key field and 1–10 attempts",
+      );
+    return this.exec(
+      "/createqueue",
+      ["/createqueue", keyField, "True", String(maxAttempts), "/queuename", name],
+      (run) => {
+        const output = this.succeeded("/createqueue", run);
+        const match = /^Created queue: ([a-f0-9-]{36})\r?\n?$/i.exec(output);
+        if (!match?.[1] || !isGuid(match[1]))
+          throw new UnexpectedOutputError(
+            "AutomateC",
+            "/createqueue",
+            output,
+            "expected native queue acknowledgement; reconcile before retrying",
+          );
+        return match[1];
+      },
+    );
   }
 
   /** Imports a process or object file (`/import`), optionally with `/overwrite`. */
@@ -83,7 +120,9 @@ export class AutomateC {
       throw new InvalidArgumentError(`File not found: ${path}`);
     });
     const args = ["/import", path, ...(options.overwrite === true ? ["/overwrite"] : [])];
-    parseImport(this.succeeded("/import", await this.exec("/import", args)));
+    await this.exec("/import", args, (run) => {
+      parseImport(this.succeeded("/import", run));
+    });
   }
 
   /**
@@ -92,11 +131,13 @@ export class AutomateC {
    */
   async publish(name: string): Promise<"published" | "already-published"> {
     checkName(name);
-    const run = await this.exec("/publish", ["/publish", name]);
-    const result = parsePublish(run.stdout, name);
-    if (result !== undefined) return result;
-    this.succeeded("/publish", run);
-    throw new UnexpectedOutputError("AutomateC", "/publish", run.stdout, "unknown answer");
+    return this.exec("/publish", ["/publish", name], (run) => {
+      this.checkInterruption("/publish", run);
+      const result = parsePublish(run.stdout, name);
+      if (result !== undefined) return result;
+      this.succeeded("/publish", run);
+      throw new UnexpectedOutputError("AutomateC", "/publish", run.stdout, "unknown answer");
+    });
   }
 
   /**
@@ -108,7 +149,14 @@ export class AutomateC {
     checkName(name);
     const cwd = await mkdtemp(join(options.dir ?? tmpdir(), "bpdev-export-"));
     try {
-      parseExport(this.succeeded("/export", await this.exec("/export", ["/export", name], cwd)));
+      await this.exec(
+        "/export",
+        ["/export", name],
+        (run) => {
+          parseExport(this.succeeded("/export", run));
+        },
+        cwd,
+      );
       const files = await readdir(cwd);
       const [file] = files;
       if (files.length !== 1 || file === undefined) {
@@ -135,55 +183,87 @@ export class AutomateC {
    */
   async run(name: string, options: RunOptions): Promise<string> {
     checkName(name);
-    if (options.resource.trim() === "") throw new InvalidArgumentError("Empty resource name");
+    checkName(options.resource);
+    if (
+      options.port !== undefined &&
+      (!Number.isInteger(options.port) || options.port < 1 || options.port > 65535)
+    )
+      throw new InvalidArgumentError("Invalid runtime port");
     const inputs = options.inputs ?? [];
     const startp = inputs.length > 0 ? ["/startp", buildStartupInputs(inputs)] : [];
     const secrets = inputs.filter((i) => i.type === "password").map((i) => i.value);
-    const run = await this.exec(
+    const sessionId = await this.exec(
       "/run",
-      [...startp, "/run", name, "/resource", options.resource],
+      [
+        ...startp,
+        "/run",
+        name,
+        "/resource",
+        options.resource,
+        ...(options.port === undefined ? [] : ["/port", String(options.port)]),
+      ],
+      (run) => {
+        const sessionId = findRunSessionId(run.stdout);
+        if (sessionId !== undefined) return sessionId;
+        // Interrupted clients cannot prove that a robot was never created. No automatic retry.
+        if (!run.interruption && isLoginFailure(run.stdout)) throw loginError(run);
+        if (!run.interruption && isRunFailureBeforeSession(run.stdout)) {
+          throw new CommandFailedError("AutomateC", "/run", output(run), run.exitCode);
+        }
+        throw new RunOutcomeUnknownError(output(run), run.exitCode);
+      },
       undefined,
       secrets,
     );
-    const sessionId = findRunSessionId(run.stdout);
-    if (sessionId !== undefined) return sessionId;
-    if (isLoginFailure(run.stdout)) throw loginError(run);
-    if (isRunFailureBeforeSession(run.stdout)) {
-      throw new CommandFailedError("AutomateC", "/run", output(run), run.exitCode);
-    }
-    throw new RunOutcomeUnknownError(output(run), run.exitCode);
+    this.sessionSecrets.set(sessionId.toLowerCase(), secrets);
+    return sessionId;
   }
 
   /** Status of a session (`/status`). */
   async status(sessionId: string): Promise<SessionStatus> {
     checkSessionId(sessionId);
-    const run = await this.exec("/status", ["/status", sessionId]);
-    return parseStatus(this.succeeded("/status", run), sessionId);
+    return this.exec("/status", ["/status", sessionId], (run) =>
+      parseStatus(this.succeeded("/status", run), sessionId),
+    );
   }
 
   /** The session's stage log (`/getlog`). */
   async getLog(sessionId: string): Promise<LogEntry[]> {
     checkSessionId(sessionId);
-    const run = await this.exec("/getlog", ["/getlog", sessionId]);
-    return parseLog(this.succeeded("/getlog", run), sessionId);
+    return this.exec(
+      "/getlog",
+      ["/getlog", sessionId],
+      (run, redact) =>
+        parseLog(this.succeeded("/getlog", run), sessionId).map((entry) => ({
+          ...entry,
+          stageName: redact(entry.stageName),
+          result: redact(entry.result),
+        })),
+      undefined,
+      this.sessionSecrets.get(sessionId.toLowerCase()) ?? [],
+    );
   }
 
   /** Asks a running session to stop at its next stop check (`/requeststop`). */
   async requestStop(sessionId: string): Promise<void> {
     checkSessionId(sessionId);
-    const run = await this.exec("/requeststop", ["/requeststop", sessionId]);
-    parseRequestStop(this.succeeded("/requeststop", run), sessionId);
+    await this.exec("/requeststop", ["/requeststop", sessionId], (run) => {
+      parseRequestStop(this.succeeded("/requeststop", run), sessionId);
+    });
   }
 
-  private async exec(
+  private async exec<T>(
     command: string,
     args: readonly string[],
+    interpret: (run: ToolRun, redact: (value: string) => string) => T,
     cwd?: string,
     extraSecrets: readonly string[] = [],
-  ): Promise<ToolRun> {
+  ): Promise<T> {
     const { user, password } = await this.options.credentials.getCredentials();
     const db = this.options.dbConnection;
-    return runTool(
+    const secrets = [password, ...extraSecrets];
+    const redact = (value: string): string => maskSecrets(value, secrets);
+    const run = await runTool(
       this.path,
       [
         "/user",
@@ -200,16 +280,57 @@ export class AutomateC {
         cwd,
         timeoutMs: this.timeoutMs,
         encoding: this.encoding,
-        secrets: [password, ...extraSecrets],
+        secrets,
+        maxOutputBytes: this.options.maxOutputBytes,
       },
     );
+    // Only typed, interpreted values leave this boundary. Never attach a raw cause.
+    try {
+      return interpret(run, redact);
+    } catch (error) {
+      if (error instanceof RunOutcomeUnknownError)
+        throw new RunOutcomeUnknownError(redact(error.output), error.exitCode);
+      if (error instanceof CommandFailedError)
+        throw new CommandFailedError(
+          error.tool,
+          error.command,
+          redact(error.output),
+          error.exitCode,
+        );
+      if (error instanceof UnexpectedOutputError)
+        throw new UnexpectedOutputError(
+          error.tool,
+          error.command,
+          redact(error.output),
+          "reply did not match the expected protocol",
+        );
+      if (error instanceof CredentialsError) throw new CredentialsError(redact(error.message));
+      if (error instanceof ToolTimeoutError)
+        throw new ToolTimeoutError(
+          error.tool,
+          error.command,
+          error.timeoutMs,
+          redact(error.output),
+        );
+      if (error instanceof ToolOutputLimitError)
+        throw new ToolOutputLimitError(error.tool, error.command, redact(error.output));
+      throw new UnexpectedOutputError("AutomateC", command, "", "cannot interpret response");
+    }
   }
 
   /** The standard output of a successful command; throws on a non-zero exit code. */
   private succeeded(command: string, run: ToolRun): string {
+    this.checkInterruption(command, run);
     if (run.exitCode === 0) return run.stdout;
     if (isLoginFailure(run.stdout)) throw loginError(run);
     throw new CommandFailedError("AutomateC", command, output(run), run.exitCode);
+  }
+
+  private checkInterruption(command: string, run: ToolRun): void {
+    if (run.interruption === "timeout")
+      throw new ToolTimeoutError("AutomateC", command, this.timeoutMs, output(run));
+    if (run.interruption === "output-limit")
+      throw new ToolOutputLimitError("AutomateC", command, output(run));
   }
 }
 
@@ -222,7 +343,10 @@ function loginError(run: ToolRun): CredentialsError {
 }
 
 function checkName(name: string): void {
-  if (name.trim() === "") throw new InvalidArgumentError("Empty process name");
+  if (name.trim() === "" || /^\s*[-/]/.test(name) || /\p{Cc}/u.test(name))
+    throw new InvalidArgumentError(
+      "Name must be nonempty, contain no control characters and not start with an option prefix",
+    );
 }
 
 function checkSessionId(sessionId: string): void {

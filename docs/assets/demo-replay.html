@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="fr">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>blueprism-mcp — démonstration enregistrée</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #f3f6fb;
+      color: #16263b;
+      font:
+        16px/1.6 system-ui,
+        sans-serif;
+    }
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 56px 24px;
+    }
+    small {
+      color: #536985;
+    }
+    h1 {
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin: 16px 0;
+    }
+    h2 {
+      font-size: 21px;
+      margin-top: 0;
+    }
+    p {
+      max-width: 780px;
+    }
+    .tag {
+      color: #286ad5;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 12px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 30px 0;
+    }
+    .card,
+    section {
+      background: white;
+      border: 1px solid #dfe6ef;
+      border-radius: 16px;
+      padding: 22px;
+    }
+    .card strong {
+      font-size: 32px;
+      display: block;
+    }
+    .columns {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 20px;
+    }
+    button {
+      border: 0;
+      background: #245bd6;
+      color: white;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font: inherit;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    button.secondary {
+      background: #eaf0fa;
+      color: #243d63;
+    }
+    ol {
+      height: 340px;
+      overflow: auto;
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      padding: 9px 12px;
+      border-bottom: 1px solid #edf1f6;
+      color: #8190a4;
+      font-size: 14px;
+    }
+    li.active {
+      background: #eaf2ff;
+      color: #122a4f;
+      border-left: 3px solid #245bd6;
+    }
+    li.done {
+      color: #234568;
+    }
+    .time {
+      display: inline-block;
+      width: 80px;
+      font-variant-numeric: tabular-nums;
+    }
+    .error {
+      color: #9e4714;
+    }
+    progress {
+      width: 100%;
+      height: 8px;
+      accent-color: #245bd6;
+    }
+    img {
+      width: 100%;
+      height: auto;
+      border: 1px solid #e0e7ef;
+      border-radius: 8px;
+    }
+    a {
+      color: #2259c6;
+    }
+    footer {
+      margin-top: 24px;
+      font-size: 13px;
+      color: #536985;
+    }
+    code {
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 750px) {
+      .columns {
+        grid-template-columns: 1fr;
+      }
+      .cards {
+        grid-template-columns: 1fr 1fr;
+      }
+      main {
+        padding-top: 28px;
+      }
+    }
+  </style>
+  <main>
+    <div class="tag">blueprism-mcp / preuves natives</div>
+    <h1>Une queue.<br />Quatre items. Une seule session.</h1>
+    <p>
+      Objets et processus générés par le MCP, exécutés dans Blue Prism 7.5.1 avec l’extension Chrome
+      officielle. Le processus finalise chaque item et poursuit la boucle après une exception.
+    </p>
+    <small
+      >29 septembre 2026 · Environnement local · Données synthétiques · Version expérimentale</small
+    >
+    <div class="cards">
+      <div class="card"><strong>2</strong>Completed</div>
+      <div class="card"><strong>1</strong>Business Exception</div>
+      <div class="card"><strong>1</strong>System Exception</div>
+      <div class="card"><strong>0</strong>Verrou restant</div>
+    </div>
+    <div class="columns">
+      <section>
+        <h2>Relecture des événements enregistrés</h2>
+        <p>
+          <small
+            >Extrait du journal natif réel, lecture accélérée. Ceci est une relecture de logs, pas
+            une vidéo du navigateur.</small
+          >
+        </p>
+        <button id="play">Lire</button><button class="secondary" id="reset">Recommencer</button>
+        <p id="position" aria-live="polite">Prêt</p>
+        <progress id="progress" max="20" value="0"></progress>
+        <ol id="events"></ol>
+      </section>
+      <section>
+        <h2>Le résultat est vérifié hors du robot</h2>
+        <p>
+          Le site compte <b>une seule soumission par item</b>. Le refus métier ne crée aucun
+          enregistrement. La confirmation illisible laisse un enregistrement unique et une System
+          Exception, sans rejeu. L’item suivant réussit.
+        </p>
+        <p>
+          L’export natif confirme 2 Completed, 2 Exception et aucun verrou. Les cinq assertions du
+          processus passent.
+        </p>
+        <img
+          src="queue-loop-studio-validation.png"
+          alt="Studio : zéro erreur avec les objets métier inclus"
+        />
+        <p>
+          <small
+            >Template originale de 14 pages. Waits bornés, XPath dynamiques, finalisation séparée du
+            bloc de travail.</small
+          >
+        </p>
+      </section>
+    </div>
+    <footer>
+      Session BP : <code>ea12f50c-97e4-4dad-b5c2-8edb345be7ce</code> · 413 entrées natives, 20
+      événements retenus ici. <a href="../10-qualification-status.md">Qualification et limites</a> ·
+      MIT / Swih · Contributions Codex et Claude.
+    </footer>
+  </main>
+  <script>
+    const events = [
+      { time: "2026-09-29 13:15:03", stage: "Get Next Item", error: false },
+      { time: "2026-09-29 13:15:08", stage: "Submit once", error: false },
+      { time: "2026-09-29 13:15:09", stage: "Mark Completed", error: false },
+      { time: "2026-09-29 13:15:09", stage: "Close Service Desk", error: false },
+      { time: "2026-09-29 13:15:10", stage: "Get Next Item", error: false },
+      { time: "2026-09-29 13:15:16", stage: "Submit once", error: false },
+      { time: "2026-09-29 13:15:17", stage: "Business Rejection", error: true },
+      { time: "2026-09-29 13:15:19", stage: "Mark Exception - No Retry", error: false },
+      { time: "2026-09-29 13:15:19", stage: "Close Service Desk", error: false },
+      { time: "2026-09-29 13:15:19", stage: "Get Next Item", error: false },
+      { time: "2026-09-29 13:15:26", stage: "Submit once", error: false },
+      { time: "2026-09-29 13:15:38", stage: "System Exception 2", error: true },
+      { time: "2026-09-29 13:15:40", stage: "Mark Exception - No Retry", error: false },
+      { time: "2026-09-29 13:15:40", stage: "Close Service Desk", error: false },
+      { time: "2026-09-29 13:15:40", stage: "Get Next Item", error: false },
+      { time: "2026-09-29 13:15:47", stage: "Submit once", error: false },
+      { time: "2026-09-29 13:15:48", stage: "Mark Completed", error: false },
+      { time: "2026-09-29 13:15:48", stage: "Close Service Desk", error: false },
+      { time: "2026-09-29 13:15:48", stage: "Get Next Item", error: false },
+      { time: "2026-09-29 13:15:49", stage: "No Eligible Item Returned", error: false },
+    ];
+    let index = 0,
+      timer = null;
+    const list = document.getElementById("events"),
+      play = document.getElementById("play"),
+      progress = document.getElementById("progress"),
+      position = document.getElementById("position");
+    for (const e of events) {
+      const row = document.createElement("li"),
+        time = document.createElement("span"),
+        stage = document.createElement("span");
+      time.className = "time";
+      time.textContent = e.time.slice(-8);
+      stage.textContent = e.stage;
+      if (e.error) stage.className = "error";
+      row.append(time, stage);
+      list.append(row);
+    }
+    function pause() {
+      clearTimeout(timer);
+      timer = null;
+      play.textContent = "Lire";
+    }
+    function tick() {
+      if (index >= events.length) {
+        pause();
+        position.textContent = "Session terminée · 5 assertions réussies";
+        return;
+      }
+      for (let i = 0; i < list.children.length; i++)
+        list.children[i].className = i < index ? "done" : i === index ? "active" : "";
+      list.children[index].scrollIntoView({ block: "nearest" });
+      position.textContent = events[index].time.slice(-8) + " · " + events[index].stage;
+      progress.value = ++index;
+      timer = setTimeout(tick, 650);
+    }
+    play.onclick = () => {
+      if (timer) pause();
+      else {
+        if (index === events.length) index = 0;
+        play.textContent = "Pause";
+        tick();
+      }
+    };
+    document.getElementById("reset").onclick = () => {
+      pause();
+      index = 0;
+      progress.value = 0;
+      position.textContent = "Prêt";
+      for (const row of list.children) row.className = "";
+      list.scrollTop = 0;
+    };
+  </script>
+</html>

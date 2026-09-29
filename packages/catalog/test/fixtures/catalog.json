@@ -71,6 +71,19 @@
           "outputs": []
         },
         {
+          "id": "AttachApplication",
+          "returns": "",
+          "arguments": [
+            { "id": "WindowTitlesCollection", "dataType": "collection" },
+            { "id": "WindowTitle", "dataType": "text" },
+            { "id": "ProcessName", "dataType": "text" },
+            { "id": "ProcessID", "dataType": "number" },
+            { "id": "Username", "dataType": "text" },
+            { "id": "ChildIndex", "dataType": "number" }
+          ],
+          "outputs": [{ "id": "trackingid", "dataType": "text" }]
+        },
+        {
           "id": "WebNavigateApplication",
           "returns": "",
           "arguments": [
@@ -87,6 +100,12 @@
         }
       ],
       "readActions": [
+        {
+          "id": "WebIsConnected",
+          "returns": "flag",
+          "arguments": [{ "id": "trackingid", "dataType": "text" }],
+          "outputs": []
+        },
         {
           "id": "WebGetDocumentURL",
           "returns": "text",

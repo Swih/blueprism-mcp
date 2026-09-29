@@ -12,6 +12,15 @@
     },
     {
       "path": "packages/bridge"
+    },
+    {
+      "path": "packages/scanner"
+    },
+    {
+      "path": "packages/runner"
+    },
+    {
+      "path": "packages/mcp"
     }
   ]
 }

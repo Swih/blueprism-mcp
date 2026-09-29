@@ -19,3 +19,5 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - run: npm run build
+      - run: node --input-type=module -e "await import('@bpdev/bridge'); await import('@bpdev/runner'); await import('@bpdev/mcp')"

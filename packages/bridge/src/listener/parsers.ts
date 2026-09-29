@@ -2,8 +2,9 @@
  * Strict parsers for the runtime resource listener's replies (Blue Prism 7.5.1, captured in
  * test/fixtures/listener). Each takes the reply lines, notifications (`>>…`) already removed.
  */
-import { BpModelError, childElements, getAttr, parseBpXml, type BpElement } from "@bpdev/model";
+import { childElements, getAttr, parseBpXml, type BpElement } from "@bpdev/model";
 import { CommandFailedError, UnexpectedOutputError } from "../errors.js";
+import { redactElement, redactText } from "./redaction.js";
 
 const GUID = "[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}";
 
@@ -67,25 +68,33 @@ export interface SessionOutput {
   readonly type: OutputType;
   /** Blue Prism's text form of the value; `undefined` when the output has no `value`. */
   readonly value: string | undefined;
-  /** The `<output>` element itself, for non-scalar values (collections). */
+  /** Sanitized XML view; password/collection payloads are opaque, never the raw tree. */
   readonly element: BpElement;
+  /** Password and unqualified collection payloads are deliberately withheld. */
+  readonly redacted?: true;
 }
 
 /** Error replies seen from the 7.5.1 listener. */
-const KNOWN_ERRORS = [/^INVALID COMMAND/, /^USER NOT SET$/, /^SESSION NOT FOUND$/, /^INVALID ID$/];
+const KNOWN_ERRORS = [
+  /^INVALID COMMAND(?: - use 'help')?$/,
+  /^USER NOT SET$/,
+  /^SESSION NOT FOUND$/,
+  /^INVALID ID$/,
+];
 
 /** A reply that is not the expected one: a known listener error, or unexpected output. */
-export function replyError(
+function replyError(
   command: string,
   reply: readonly string[],
   reason: string,
 ): CommandFailedError | UnexpectedOutputError {
-  const text = reply.join("\n");
   const [first] = reply;
   if (reply.length === 1 && first !== undefined && KNOWN_ERRORS.some((re) => re.test(first))) {
-    return new CommandFailedError("listener", command, text);
+    return new CommandFailedError("listener", command, "Listener refused the command");
   }
-  return new UnexpectedOutputError("listener", command, text, reason);
+  // Error classes retain `output`: never pass untrusted replies, XML parser messages or
+  // causes here, even if a caller did not register the secret that they contain.
+  return new UnexpectedOutputError("listener", command, "[reply withheld]", reason);
 }
 
 function single(command: string, reply: readonly string[], pattern: RegExp): RegExpExecArray {
@@ -101,7 +110,9 @@ export function parseVersion(reply: readonly string[]): ListenerVersion {
     reply,
     /^(AUTOMATE RESOURCE PC \/ LISTENER) (\d+)$/,
   );
-  return { product, version: Number(version) };
+  const number = Number(version);
+  if (!Number.isSafeInteger(number)) throw replyError("version", reply, "invalid version number");
+  return { product, version: number };
 }
 
 /** `busy` → `yes` / `no`. */
@@ -119,56 +130,88 @@ const STATUS_HEADER = "RESOURCE UNIT";
 const STATUS_SESSION = new RegExp(`^ - (${RUNNER_STATUSES.join("|")}) (${GUID})(?: - (.*))?$`);
 const STATUS_TOTAL = /^Total running: (\d+)$/;
 
-/** Whether a `status` reply is complete (its last line is `Total running: N`, or an error). */
+/** Incremental framing check: terminal line, error, or unsupported continuation. */
 export function isStatusReplyComplete(reply: readonly string[]): boolean {
   if (reply.length === 0) return false;
-  return reply[0] !== STATUS_HEADER || STATUS_TOTAL.test(reply.at(-1) ?? "");
+  // Reject an unexpected continuation immediately; there is no documented delimiter for
+  // multiline exception text. Do not guess that it belongs to the previous session.
+  // Earlier lines have already been checked by the transport. Avoid rescanning the whole
+  // reply for every session; the final parser still validates every line before returning.
+  return (
+    reply[0] !== STATUS_HEADER || (reply.length > 1 && !STATUS_SESSION.test(reply.at(-1) ?? ""))
+  );
 }
 
 /**
  * `status` → `RESOURCE UNIT`, one ` - <STATUS> <sessionId>[ - <message>]` line per session,
  * then `Total running: N`.
  */
-export function parseListenerStatus(reply: readonly string[]): ListenerStatus {
+export function parseListenerStatus(
+  reply: readonly string[],
+  secrets: readonly string[] = [],
+): ListenerStatus {
   const total = STATUS_TOTAL.exec(reply.at(-1) ?? "");
   if (reply[0] !== STATUS_HEADER || !total || reply.length < 2) {
     throw replyError("status", reply, `expected '${STATUS_HEADER}' … 'Total running: N'`);
   }
   const sessions = reply.slice(1, -1).map((line): ListenerSession => {
     const match = STATUS_SESSION.exec(line);
-    if (!match) throw replyError("status", reply, `unexpected session line "${line}"`);
+    if (!match) throw replyError("status", reply, "unexpected session line");
     const [, status, sessionId = "", message] = match;
     return {
       status: status as RunnerStatus,
       sessionId,
-      ...(message === undefined ? {} : { message }),
+      ...(message === undefined ? {} : { message: redactText(message, secrets) }),
     };
   });
-  return { sessions, totalRunning: Number(total[1]) };
+  const totalRunning = Number(total[1]);
+  if (!Number.isSafeInteger(totalRunning)) {
+    throw replyError("status", reply, "invalid session count");
+  }
+  return { sessions, totalRunning };
 }
 
 /** `outputs <id>` → `OUTPUTS:<outputs><output name type value />…</outputs>`. */
-export function parseOutputs(reply: readonly string[]): SessionOutput[] {
+export function parseOutputs(
+  reply: readonly string[],
+  secrets: readonly string[] = [],
+): SessionOutput[] {
   const [, xml = ""] = single("outputs", reply, /^OUTPUTS:(.*)$/);
   let root: BpElement;
   try {
     root = parseBpXml(xml).root;
-  } catch (error) {
-    if (!(error instanceof BpModelError)) throw error;
-    throw replyError("outputs", reply, `malformed XML: ${error.message}`);
+  } catch {
+    throw replyError("outputs", reply, "malformed XML");
   }
   if (root.name !== "outputs" || childElements(root).length !== root.children.length) {
     throw replyError("outputs", reply, "expected <outputs> holding <output> elements");
   }
-  return childElements(root).map((element): SessionOutput => {
+  const elements = childElements(root);
+  const outputSecrets = elements.flatMap((element) =>
+    getAttr(element, "type") === "password" ? [getAttr(element, "value") ?? ""] : [],
+  );
+  const allSecrets = [...secrets, ...outputSecrets];
+  return elements.map((element): SessionOutput => {
     const name = getAttr(element, "name");
     const type = getAttr(element, "type");
     if (element.name !== "output" || name === undefined || type === undefined) {
       throw replyError("outputs", reply, "expected <output name type>");
     }
     if (!(OUTPUT_TYPES as readonly string[]).includes(type)) {
-      throw replyError("outputs", reply, `unknown output type "${type}"`);
+      throw replyError("outputs", reply, "unknown output type");
     }
-    return { name, type: type as OutputType, value: getAttr(element, "value"), element };
+    let sanitized: BpElement;
+    try {
+      sanitized = redactElement(element, allSecrets);
+    } catch {
+      throw replyError("outputs", reply, "unsupported XML structure");
+    }
+    return {
+      name: redactText(name, allSecrets),
+      type: type as OutputType,
+      value: getAttr(sanitized, "value"),
+      element: sanitized,
+      ...(type === "password" || type === "collection" ? { redacted: true as const } : {}),
+    };
   });
 }

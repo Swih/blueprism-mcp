@@ -2,6 +2,8 @@ import { SpecValidationError, type SpecIssue } from "./errors.js";
 import type { ActionSpec, ObjectSpec, TestHarnessSpec } from "./ir.js";
 import type { Param } from "./stages.js";
 import { literalExpression } from "./resolve-object.js";
+import { scalarComparisonKey } from "./scalar-values.js";
+import type { HarnessAssertion } from "./verify-harness.js";
 
 export interface ResolvedCall {
   readonly object: string;
@@ -17,6 +19,7 @@ export interface ResolvedHarness {
   readonly calls: readonly ResolvedCall[];
   /** Process outputs: every expected output, once. */
   readonly outputs: readonly Param[];
+  readonly assertions: readonly HarnessAssertion[];
   readonly cleanupAction: string;
   readonly cleanupObject: string;
 }
@@ -53,6 +56,7 @@ export function resolveHarness(
     report("object", missingObject(spec.object));
   }
   const outputs = new Map<string, Param>();
+  const assertions: HarnessAssertion[] = [];
 
   const calls = spec.calls.flatMap((call, i): ResolvedCall[] => {
     const path = `calls[${i}] "${call.action}"`;
@@ -93,11 +97,22 @@ export function resolveHarness(
       }
       return [{ name: p.name, dataType: p.type, expression }];
     });
-    const expected = Object.keys(call.expect ?? {}).flatMap((name) => {
+    const expected = Object.entries(call.expect ?? {}).flatMap(([name, value]) => {
       const param = action.outputs.find((p) => p.name === name);
       if (!param) {
         const names = action.outputs.map((p) => p.name).join(", ") || "none";
         report(`${path}.expect.${name}`, `not an output of ${action.name} (outputs: ${names})`);
+        return [];
+      }
+      if (param.type === "password") {
+        report(
+          `${path}.expect.${name}`,
+          "password assertions are forbidden; never persist an expected secret",
+        );
+        return [];
+      }
+      if (scalarComparisonKey(param.type, value) === undefined) {
+        report(`${path}.expect.${name}`, `must be a valid ${param.type} literal`);
         return [];
       }
       if (outputs.has(name)) {
@@ -108,6 +123,14 @@ export function resolveHarness(
         return [];
       }
       outputs.set(name, { name, dataType: param.type });
+      assertions.push({
+        callIndex: i,
+        object: objectName,
+        action: action.name,
+        outputName: name,
+        type: param.type,
+        expected: value,
+      });
       return [{ name, dataType: param.type, into: name }];
     });
     return [{ object: objectName, action, inputs, outputs: expected }];
@@ -139,6 +162,7 @@ export function resolveHarness(
     object: spec.object,
     calls,
     outputs: [...outputs.values()],
+    assertions,
     cleanupAction: spec.cleanupAction,
     cleanupObject,
   };
